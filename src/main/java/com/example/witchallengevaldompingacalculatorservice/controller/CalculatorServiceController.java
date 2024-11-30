@@ -3,6 +3,8 @@ package com.example.witchallengevaldompingacalculatorservice.controller;
 
 import com.example.witchallengevaldompingacalculatorservice.dto.CalculatorDTO;
 import com.example.witchallengevaldompingacalculatorservice.service.CalculatorService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,38 +18,18 @@ import java.math.BigDecimal;
 @RequestMapping("/calculator")
 public class CalculatorServiceController {
 
-    private final CalculatorService calculatorService;
+    private final RabbitTemplate rabbitTemplate;
+    private final String queueName;
 
-    public CalculatorServiceController(CalculatorService calculatorService) {
-        this.calculatorService = calculatorService;
+    public CalculatorServiceController(RabbitTemplate rabbitTemplate,
+                                @Value("${rabbitmq.queue.name}") String queueName) {
+        this.rabbitTemplate = rabbitTemplate;
+        this.queueName = queueName;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<BigDecimal> add(@RequestBody CalculatorDTO request) {
-        System.out.println("Adding");
-        return ResponseEntity.ok(calculatorService.add(request.getA(), request.getB()));
-    }
-
-    @PostMapping("/subtract")
-    public ResponseEntity<BigDecimal> subtract(@RequestBody CalculatorDTO request) {
-        System.out.println("Subtracting");
-        return ResponseEntity.ok(calculatorService.subtract(request.getA(), request.getB()));
-    }
-
-    @PostMapping("/multiply")
-    public ResponseEntity<BigDecimal> multiply(@RequestBody CalculatorDTO request) {
-        System.out.println("Multiplication");
-        return ResponseEntity.ok(calculatorService.multiply(request.getA(), request.getB()));
-    }
-
-    @PostMapping("/divide")
-    public ResponseEntity<BigDecimal> divide(@RequestBody CalculatorDTO request) {
-        System.out.println("Dividing");
-
-        try {
-            return ResponseEntity.ok(calculatorService.divide(request.getA(), request.getB()));
-        } catch (ArithmeticException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    @PostMapping("/send")
+    public ResponseEntity<String> sendRequest(@RequestBody CalculatorDTO request) {
+        rabbitTemplate.convertAndSend(queueName, request);
+        return ResponseEntity.ok("Request sent to RabbitMQ");
     }
 }

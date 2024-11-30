@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+
 @Service
 public class CalculatorService {
     private static final int SCALE = 10;

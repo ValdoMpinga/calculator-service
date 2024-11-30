@@ -1,25 +1,18 @@
 package com.example.witchallengevaldompingacalculatorservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 
 public class CalculatorDTO {
+
+    @JsonProperty("a")
     private BigDecimal a;
+
+    @JsonProperty("b")
     private BigDecimal b;
 
+    @JsonProperty("operation")
+    private String operation;
 
-    public BigDecimal getA() {
-        return a;
-    }
-
-    public void setA(BigDecimal a) {
-        this.a = a;
-    }
-
-    public BigDecimal getB() {
-        return b;
-    }
-
-    public void setB(BigDecimal b) {
-        this.b = b;
-    }
 }
